@@ -1,6 +1,13 @@
 
 from tkinter import *
+import random
 
+
+colors = {
+    "red": ["#ff0000", "#900000"],
+    "green": ["#00ff00", "#009000"],
+    "blue": ["#0000ff", "#000090"],
+}
 
 root = Tk()
 root.title("Test")
@@ -19,11 +26,12 @@ x = 0
 y = 0
 for h in range(len(matrix)):
     for w in range(len(matrix[0])):
-        rect = c.create_rectangle(x, y, x + block_size, y + block_size, fill="black")
+        color = random.choice(list(colors.keys()))
+        rect = c.create_rectangle(x, y, x + block_size, y + block_size, fill=colors[color][0])
         block = {
             "rect": rect,
             "selected": False,
-            "color": "black",
+            "color": color,
         }
         matrix[h][w] = block
         x += block_size
@@ -40,9 +48,9 @@ def change_bg(event):
             coords = c.coords(rect)
             if (coords[0] <= event.x <= coords[2]) and (coords[1] <= event.y <= coords[3]):
                 if block["selected"]:
-                    c.itemconfig(rect, fill="black")
+                    c.itemconfig(rect, fill=colors[block["color"]][0])
                 else:
-                    c.itemconfig(rect, fill="green")
+                    c.itemconfig(rect, fill=colors[block["color"]][1])
                 block["selected"] = not block["selected"]
                 block_found = True
                 break
