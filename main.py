@@ -35,8 +35,6 @@ for h in range(len(matrix)):
 def change_bg(event):
     block_found = False
     for string in matrix:
-        if block_found:
-            break
         for block in string:
             rect = block["rect"]
             coords = c.coords(rect)
@@ -46,9 +44,10 @@ def change_bg(event):
                 else:
                     c.itemconfig(rect, fill="green")
                 block["selected"] = not block["selected"]
-
                 block_found = True
                 break
+        if block_found:
+            break
 
 
 c.bind("<Button-1>", change_bg)
