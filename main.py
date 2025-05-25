@@ -32,6 +32,7 @@ for h in range(len(matrix)):
             "rect": rect,
             "selected": False,
             "color": color,
+            "matrix_coords": (h, w),
         }
         matrix[h][w] = block
         x += block_size
@@ -39,19 +40,47 @@ for h in range(len(matrix)):
     x = 0
     y += block_size
 
+selected_blocks = []
+
+
+def remove_selected_blocks():
+    for block in selected_blocks:
+        y, x = block["matrix_coords"]
+        matrix[y][x] = None
+        c.delete(block["rect"])
+
+    selected_blocks.clear()
+
 
 def change_bg(event):
     block_found = False
+
     for string in matrix:
         for block in string:
+            if block is None:
+                continue
+
             rect = block["rect"]
             coords = c.coords(rect)
             if (coords[0] <= event.x <= coords[2]) and (coords[1] <= event.y <= coords[3]):
                 if block["selected"]:
                     c.itemconfig(rect, fill=colors[block["color"]][0])
+                    block["selected"] = False
+                    selected_blocks.remove(block)
                 else:
-                    c.itemconfig(rect, fill=colors[block["color"]][1])
-                block["selected"] = not block["selected"]
+                    if len(selected_blocks) == 0:
+                        c.itemconfig(rect, fill=colors[block["color"]][1])
+                        block["selected"] = True
+                        selected_blocks.append(block)
+                    elif block["color"] == selected_blocks[0]["color"]:
+                        # также нужно добавить проверку соседства блоков
+                        c.itemconfig(rect, fill=colors[block["color"]][1])
+                        block["selected"] = True
+                        selected_blocks.append(block)
+
+                        if len(selected_blocks) == 3:
+                            remove_selected_blocks()
+
                 block_found = True
                 break
         if block_found:
