@@ -52,7 +52,20 @@ def remove_selected_blocks():
     selected_blocks.clear()
 
 
-def change_bg(event):
+def is_siblings(new_block):
+    new_block_y, new_block_x = new_block["matrix_coords"]
+    for block in selected_blocks:
+        block_y, block_x = block["matrix_coords"]
+        if block_y == new_block_y:
+            if (block_x == new_block_x - 1) or (block_x == new_block_x + 1):
+                return True
+        elif block_x == new_block_x:
+            if (block_y == new_block_y - 1) or (block_y == new_block_y + 1):
+                return True
+    return False
+
+
+def select_block(event):
     block_found = False
 
     for string in matrix:
@@ -72,7 +85,7 @@ def change_bg(event):
                         c.itemconfig(rect, fill=colors[block["color"]][1])
                         block["selected"] = True
                         selected_blocks.append(block)
-                    elif block["color"] == selected_blocks[0]["color"]:
+                    elif (block["color"] == selected_blocks[0]["color"]) and (is_siblings(block)):
                         # также нужно добавить проверку соседства блоков
                         c.itemconfig(rect, fill=colors[block["color"]][1])
                         block["selected"] = True
@@ -87,8 +100,8 @@ def change_bg(event):
             break
 
 
-c.bind("<Button-1>", change_bg)
-# c.tag_bind("rect", "<Button-1>", change_bg)
+c.bind("<Button-1>", select_block)
+# c.tag_bind("rect", "<Button-1>", select_block)
 
 root.mainloop()
 
