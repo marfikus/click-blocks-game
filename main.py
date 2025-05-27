@@ -10,7 +10,7 @@ colors = {
 }
 
 root = Tk()
-root.title("Test")
+root.title("Three identical")
 root.resizable(False, False)
 
 matrix_size = 5
@@ -65,6 +65,20 @@ def is_siblings(new_block):
     return False
 
 
+def fall_blocks():
+    for i in range(len(matrix) - 1, 0, -1):
+        for j in range(len(matrix[0])):
+            if matrix[i][j] is None:
+                for k in range(i - 1, -1, -1):
+                    if matrix[k][j] is not None:
+                        block = matrix[k][j]
+                        matrix[k][j] = None
+                        block["matrix_coords"] = (i, j)
+                        c.move(block["rect"], 0, block_size * (i - k))
+                        matrix[i][j] = block
+                        break
+
+
 def select_block(event):
     block_found = False
 
@@ -86,13 +100,13 @@ def select_block(event):
                         block["selected"] = True
                         selected_blocks.append(block)
                     elif (block["color"] == selected_blocks[0]["color"]) and (is_siblings(block)):
-                        # также нужно добавить проверку соседства блоков
                         c.itemconfig(rect, fill=colors[block["color"]][1])
                         block["selected"] = True
                         selected_blocks.append(block)
 
                         if len(selected_blocks) == 3:
                             remove_selected_blocks()
+                            fall_blocks()
 
                 block_found = True
                 break
