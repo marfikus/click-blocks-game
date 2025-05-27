@@ -13,7 +13,7 @@ root = Tk()
 root.title("Three identical")
 root.resizable(False, False)
 
-matrix_size = 5
+matrix_size = 10
 block_size = 40
 width = block_size * matrix_size
 height = block_size * matrix_size
@@ -114,8 +114,43 @@ def select_block(event):
             break
 
 
+def add_new_block(event):
+    max_attempts = 50
+    attempt = 0
+    success = False
+
+    h = None
+    w = None
+    while True:
+        attempt += 1
+        h = random.randint(0, len(matrix) - 1)
+        w = random.randint(0, len(matrix[0]) - 1)
+        if matrix[h][w] is None:
+            success = True
+            break
+        if attempt == max_attempts:
+            print("Max attempts for adding random block!")
+            break
+
+    if not success:
+        return
+
+    color = random.choice(list(colors.keys()))
+    x = w * block_size
+    y = h * block_size
+    rect = c.create_rectangle(x, y, x + block_size, y + block_size, fill=colors[color][0])
+    block = {
+        "rect": rect,
+        "selected": False,
+        "color": color,
+        "matrix_coords": (h, w),
+    }
+    matrix[h][w] = block
+    fall_blocks()
+
+
 c.bind("<Button-1>", select_block)
-# c.tag_bind("rect", "<Button-1>", select_block)
+c.bind("<Button-3>", add_new_block)
 
 root.mainloop()
 
