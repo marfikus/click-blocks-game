@@ -13,7 +13,7 @@ root = Tk()
 root.title("Three identical")
 root.resizable(False, False)
 
-matrix_size = 10
+matrix_size = 7
 block_size = 40
 width = block_size * matrix_size
 height = block_size * matrix_size
