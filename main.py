@@ -19,6 +19,8 @@ width = block_size * matrix_size
 height = block_size * matrix_size
 matrix = [[None for _ in range(matrix_size)] for _ in range(matrix_size)]
 
+remove_all_siblings = False
+
 c = Canvas(root, width=width, height=height, bg="white")
 c.pack()
 
@@ -43,13 +45,11 @@ for h in range(len(matrix)):
 selected_blocks = []
 
 
-def remove_selected_blocks():
-    for block in selected_blocks:
+def remove_blocks(blocks):
+    for block in blocks:
         y, x = block["matrix_coords"]
         matrix[y][x] = None
         c.delete(block["rect"])
-
-    selected_blocks.clear()
 
 
 def is_siblings(new_block):
@@ -79,7 +79,7 @@ def fall_blocks():
                         break
 
 
-def select_block(event):
+def click_block(event):
     block_found = False
 
     for string in matrix:
@@ -90,23 +90,31 @@ def select_block(event):
             rect = block["rect"]
             coords = c.coords(rect)
             if (coords[0] <= event.x <= coords[2]) and (coords[1] <= event.y <= coords[3]):
-                if block["selected"]:
-                    c.itemconfig(rect, fill=colors[block["color"]][0])
-                    block["selected"] = False
-                    selected_blocks.remove(block)
-                else:
-                    if len(selected_blocks) == 0:
-                        c.itemconfig(rect, fill=colors[block["color"]][1])
-                        block["selected"] = True
-                        selected_blocks.append(block)
-                    elif (block["color"] == selected_blocks[0]["color"]) and (is_siblings(block)):
-                        c.itemconfig(rect, fill=colors[block["color"]][1])
-                        block["selected"] = True
-                        selected_blocks.append(block)
 
-                        if len(selected_blocks) == 3:
-                            remove_selected_blocks()
-                            fall_blocks()
+                if remove_all_siblings:
+                    siblings = find_siblings(block)
+                    if len(siblings) >= 3:
+                        remove_blocks(siblings)
+                        fall_blocks()
+                else:
+                    if block["selected"]:
+                        c.itemconfig(rect, fill=colors[block["color"]][0])
+                        block["selected"] = False
+                        selected_blocks.remove(block)
+                    else:
+                        if len(selected_blocks) == 0:
+                            c.itemconfig(rect, fill=colors[block["color"]][1])
+                            block["selected"] = True
+                            selected_blocks.append(block)
+                        elif (block["color"] == selected_blocks[0]["color"]) and (is_siblings(block)):
+                            c.itemconfig(rect, fill=colors[block["color"]][1])
+                            block["selected"] = True
+                            selected_blocks.append(block)
+
+                            if len(selected_blocks) == 3:
+                                remove_blocks(selected_blocks)
+                                selected_blocks.clear()
+                                fall_blocks()
 
                 block_found = True
                 break
@@ -149,7 +157,48 @@ def add_new_block(event):
     fall_blocks()
 
 
-c.bind("<Button-1>", select_block)
+def find_siblings(block, all_siblings=None):
+    directions = [
+        (-1, 0),
+        (0, 1),
+        (1, 0),
+        (0, -1)
+    ]
+
+    if all_siblings is None:
+        all_siblings = []
+    new_siblings = []
+
+    def exist_in_all_siblings(check_block):
+        for block in all_siblings:
+            if check_block["rect"] == block["rect"]:
+                return True
+        return False
+
+
+    all_siblings.append(block)
+    new_siblings.append(block)
+
+    for direction in directions:
+        x = block["matrix_coords"][1] + direction[1]
+        y = block["matrix_coords"][0] + direction[0]
+
+        if (x < 0) or (x > len(matrix[0]) - 1):
+            continue
+        if (y < 0) or (y > len(matrix) - 1):
+            continue
+        if matrix[y][x] is None:
+            continue
+        if matrix[y][x]["color"] != block["color"]:
+            continue
+        if exist_in_all_siblings(matrix[y][x]):
+            continue
+
+        new_siblings += find_siblings(matrix[y][x], all_siblings)
+    return new_siblings
+
+
+c.bind("<Button-1>", click_block)
 c.bind("<Button-3>", add_new_block)
 
 root.mainloop()
