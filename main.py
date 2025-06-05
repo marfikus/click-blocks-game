@@ -19,7 +19,8 @@ width = block_size * matrix_size
 height = block_size * matrix_size
 matrix = [[None for _ in range(matrix_size)] for _ in range(matrix_size)]
 
-remove_all_siblings = False
+remove_all_siblings = True
+add_multiple_blocks = True
 
 c = Canvas(root, width=width, height=height, bg="white")
 c.pack()
@@ -122,7 +123,7 @@ def click_block(event):
             break
 
 
-def add_new_block(event):
+def add_new_block():
     max_attempts = 50
     attempt = 0
     success = False
@@ -141,7 +142,7 @@ def add_new_block(event):
             break
 
     if not success:
-        return
+        return False
 
     color = random.choice(list(colors.keys()))
     x = w * block_size
@@ -154,6 +155,17 @@ def add_new_block(event):
         "matrix_coords": (h, w),
     }
     matrix[h][w] = block
+    return True
+
+
+def add_new_blocks(event):
+    if add_multiple_blocks:
+        new_blocks_num = random.randint(1, 3)
+        for _ in range(new_blocks_num):
+            if not add_new_block():
+                break
+    else:
+        add_new_block()
     fall_blocks()
 
 
@@ -199,7 +211,7 @@ def find_siblings(block, all_siblings=None):
 
 
 c.bind("<Button-1>", click_block)
-c.bind("<Button-3>", add_new_block)
+c.bind("<Button-3>", add_new_blocks)
 
 root.mainloop()
 
