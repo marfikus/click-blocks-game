@@ -22,6 +22,11 @@ matrix = [[None for _ in range(matrix_size)] for _ in range(matrix_size)]
 remove_all_siblings = True
 add_multiple_blocks = True
 
+remove_all_siblings_var = BooleanVar()
+remove_all_siblings_var.set(1)
+add_multiple_blocks_var = BooleanVar()
+add_multiple_blocks_var.set(1)
+
 c = Canvas(root, width=width, height=height, bg="white")
 c.pack()
 
@@ -215,7 +220,45 @@ def start_game():
 
 
 def show_settings():
-    print("show_settings")
+    global settings_is_active
+    if settings_is_active:
+        return
+
+    def update_settings():
+        global remove_all_siblings, add_multiple_blocks
+
+        remove_all_siblings = remove_all_siblings_var.get()
+        add_multiple_blocks = add_multiple_blocks_var.get()
+
+
+    def close_settings():
+        global settings_is_active
+
+        settings.destroy()
+        settings_is_active = False
+
+
+    settings = Toplevel()
+    settings.title("Settings")
+    settings.resizable(False, False)
+    settings.protocol("WM_DELETE_WINDOW", close_settings)
+    settings_is_active = True
+
+    Checkbutton(settings, 
+        text="remove_all_siblings",
+        variable=remove_all_siblings_var,
+        onvalue=1,
+        offvalue=0,
+        command=update_settings
+    ).pack()
+
+    Checkbutton(settings, 
+        text="add_multiple_blocks",
+        variable=add_multiple_blocks_var,
+        onvalue=1,
+        offvalue=0,
+        command=update_settings
+    ).pack()
 
 
 c.bind("<Button-1>", click_block)
@@ -225,6 +268,8 @@ mainmenu = Menu(root)
 root.config(menu=mainmenu)
 mainmenu.add_command(label="New game", command=start_game)
 mainmenu.add_command(label="Settings", command=show_settings)
+
+settings_is_active = False
 
 root.mainloop()
 
