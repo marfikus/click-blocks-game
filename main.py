@@ -210,8 +210,21 @@ def find_siblings(block, all_siblings=None):
     return new_siblings
 
 
+def start_game():
+    print("start_game")
+
+
+def show_settings():
+    print("show_settings")
+
+
 c.bind("<Button-1>", click_block)
 c.bind("<Button-3>", add_new_blocks)
+
+mainmenu = Menu(root)
+root.config(menu=mainmenu)
+mainmenu.add_command(label="New game", command=start_game)
+mainmenu.add_command(label="Settings", command=show_settings)
 
 root.mainloop()
 
