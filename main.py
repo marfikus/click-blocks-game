@@ -2,6 +2,7 @@
 from tkinter import *
 import random
 from settings import Settings
+from settings_screen import SettingsScreen
 
 
 colors = {
@@ -15,14 +16,11 @@ root.title("Three identical")
 root.resizable(False, False)
 
 settings = Settings()
+settings_screen = SettingsScreen(settings)
+
 width = settings.block_size * settings.matrix_size
 height = settings.block_size * settings.matrix_size
 matrix = [[None for _ in range(settings.matrix_size)] for _ in range(settings.matrix_size)]
-
-remove_all_siblings_var = BooleanVar()
-remove_all_siblings_var.set(1)
-add_multiple_blocks_var = BooleanVar()
-add_multiple_blocks_var.set(1)
 
 c = Canvas(root, width=width, height=height, bg="white")
 c.pack()
@@ -216,55 +214,13 @@ def start_game():
     print("start_game")
 
 
-def show_settings_screen():
-    global settings_screen_is_active
-    if settings_screen_is_active:
-        return
-
-    def update_settings():
-        settings.remove_all_siblings = remove_all_siblings_var.get()
-        settings.add_multiple_blocks = add_multiple_blocks_var.get()
-
-
-    def close_settings_screen():
-        global settings_is_active
-
-        settings_screen.destroy()
-        settings_screen_is_active = False
-
-
-    settings_screen = Toplevel()
-    settings_screen.title("Settings")
-    settings_screen.resizable(False, False)
-    settings_screen.protocol("WM_DELETE_WINDOW", close_settings_screen)
-    settings_screen_is_active = True
-
-    Checkbutton(settings_screen, 
-        text="remove_all_siblings",
-        variable=remove_all_siblings_var,
-        onvalue=1,
-        offvalue=0,
-        command=update_settings
-    ).pack()
-
-    Checkbutton(settings_screen, 
-        text="add_multiple_blocks",
-        variable=add_multiple_blocks_var,
-        onvalue=1,
-        offvalue=0,
-        command=update_settings
-    ).pack()
-
-
 c.bind("<Button-1>", click_block)
 c.bind("<Button-3>", add_new_blocks)
 
 mainmenu = Menu(root)
 root.config(menu=mainmenu)
 mainmenu.add_command(label="New game", command=start_game)
-mainmenu.add_command(label="Settings", command=show_settings_screen)
-
-settings_screen_is_active = False
+mainmenu.add_command(label="Settings", command=settings_screen.show)
 
 root.mainloop()
 
