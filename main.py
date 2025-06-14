@@ -1,6 +1,7 @@
 
 from tkinter import *
 import random
+from settings import Settings
 
 
 colors = {
@@ -13,14 +14,10 @@ root = Tk()
 root.title("Three identical")
 root.resizable(False, False)
 
-matrix_size = 7
-block_size = 40
-width = block_size * matrix_size
-height = block_size * matrix_size
-matrix = [[None for _ in range(matrix_size)] for _ in range(matrix_size)]
-
-remove_all_siblings = True
-add_multiple_blocks = True
+settings = Settings()
+width = settings.block_size * settings.matrix_size
+height = settings.block_size * settings.matrix_size
+matrix = [[None for _ in range(settings.matrix_size)] for _ in range(settings.matrix_size)]
 
 remove_all_siblings_var = BooleanVar()
 remove_all_siblings_var.set(1)
@@ -35,7 +32,7 @@ y = 0
 for h in range(len(matrix)):
     for w in range(len(matrix[0])):
         color = random.choice(list(colors.keys()))
-        rect = c.create_rectangle(x, y, x + block_size, y + block_size, fill=colors[color][0])
+        rect = c.create_rectangle(x, y, x + settings.block_size, y + settings.block_size, fill=colors[color][0])
         block = {
             "rect": rect,
             "selected": False,
@@ -43,10 +40,10 @@ for h in range(len(matrix)):
             "matrix_coords": (h, w),
         }
         matrix[h][w] = block
-        x += block_size
+        x += settings.block_size
 
     x = 0
-    y += block_size
+    y += settings.block_size
 
 selected_blocks = []
 
@@ -80,7 +77,7 @@ def fall_blocks():
                         block = matrix[k][j]
                         matrix[k][j] = None
                         block["matrix_coords"] = (i, j)
-                        c.move(block["rect"], 0, block_size * (i - k))
+                        c.move(block["rect"], 0, settings.block_size * (i - k))
                         matrix[i][j] = block
                         break
 
@@ -97,7 +94,7 @@ def click_block(event):
             coords = c.coords(rect)
             if (coords[0] <= event.x <= coords[2]) and (coords[1] <= event.y <= coords[3]):
 
-                if remove_all_siblings:
+                if settings.remove_all_siblings:
                     siblings = find_siblings(block)
                     if len(siblings) >= 3:
                         remove_blocks(siblings)
@@ -150,9 +147,9 @@ def add_new_block():
         return False
 
     color = random.choice(list(colors.keys()))
-    x = w * block_size
-    y = h * block_size
-    rect = c.create_rectangle(x, y, x + block_size, y + block_size, fill=colors[color][0])
+    x = w * settings.block_size
+    y = h * settings.block_size
+    rect = c.create_rectangle(x, y, x + settings.block_size, y + settings.block_size, fill=colors[color][0])
     block = {
         "rect": rect,
         "selected": False,
@@ -164,7 +161,7 @@ def add_new_block():
 
 
 def add_new_blocks(event):
-    if add_multiple_blocks:
+    if settings.add_multiple_blocks:
         new_blocks_num = random.randint(1, 3)
         for _ in range(new_blocks_num):
             if not add_new_block():
@@ -219,32 +216,30 @@ def start_game():
     print("start_game")
 
 
-def show_settings():
-    global settings_is_active
-    if settings_is_active:
+def show_settings_screen():
+    global settings_screen_is_active
+    if settings_screen_is_active:
         return
 
     def update_settings():
-        global remove_all_siblings, add_multiple_blocks
-
-        remove_all_siblings = remove_all_siblings_var.get()
-        add_multiple_blocks = add_multiple_blocks_var.get()
+        settings.remove_all_siblings = remove_all_siblings_var.get()
+        settings.add_multiple_blocks = add_multiple_blocks_var.get()
 
 
-    def close_settings():
+    def close_settings_screen():
         global settings_is_active
 
-        settings.destroy()
-        settings_is_active = False
+        settings_screen.destroy()
+        settings_screen_is_active = False
 
 
-    settings = Toplevel()
-    settings.title("Settings")
-    settings.resizable(False, False)
-    settings.protocol("WM_DELETE_WINDOW", close_settings)
-    settings_is_active = True
+    settings_screen = Toplevel()
+    settings_screen.title("Settings")
+    settings_screen.resizable(False, False)
+    settings_screen.protocol("WM_DELETE_WINDOW", close_settings_screen)
+    settings_screen_is_active = True
 
-    Checkbutton(settings, 
+    Checkbutton(settings_screen, 
         text="remove_all_siblings",
         variable=remove_all_siblings_var,
         onvalue=1,
@@ -252,7 +247,7 @@ def show_settings():
         command=update_settings
     ).pack()
 
-    Checkbutton(settings, 
+    Checkbutton(settings_screen, 
         text="add_multiple_blocks",
         variable=add_multiple_blocks_var,
         onvalue=1,
@@ -267,9 +262,9 @@ c.bind("<Button-3>", add_new_blocks)
 mainmenu = Menu(root)
 root.config(menu=mainmenu)
 mainmenu.add_command(label="New game", command=start_game)
-mainmenu.add_command(label="Settings", command=show_settings)
+mainmenu.add_command(label="Settings", command=show_settings_screen)
 
-settings_is_active = False
+settings_screen_is_active = False
 
 root.mainloop()
 
