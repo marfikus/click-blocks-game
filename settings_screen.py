@@ -7,7 +7,8 @@ class SettingsScreen:
         self.settings = settings
         self.settings_screen = None
         self.settings_screen_is_active = False
-        main_screen.link_to_mainmenu(self)
+        self.main_screen = main_screen
+        self.main_screen.link_to_mainmenu(self)
 
 
     def show(self):
@@ -15,6 +16,9 @@ class SettingsScreen:
             return
 
         self.settings_screen = Toplevel()
+        x = self.main_screen.root.winfo_x()
+        y = self.main_screen.root.winfo_y()
+        self.settings_screen.geometry(f"+{x}+{y}")
         self.settings_screen.title("Settings")
         self.settings_screen.resizable(False, False)
         self.settings_screen.protocol("WM_DELETE_WINDOW", self.close)
