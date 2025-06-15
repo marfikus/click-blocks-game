@@ -13,8 +13,16 @@ class MainScreen:
     def __init__(self, settings):
         self.settings = settings
         self.settings_screen = None
-        self.root = None
-        self.mainmenu = None
+
+        self.root = Tk()
+        self.root.title("Three identical")
+        self.root.resizable(False, False)
+
+        self.mainmenu = Menu(self.root)
+        self.root.config(menu=self.mainmenu)
+        self.mainmenu.add_command(label="New game", command=self.start_game)
+        self.mainmenu.add_command(label="Settings", command=self.show_settings)
+
         self.width = None
         self.height = None
         self.matrix = None
@@ -29,18 +37,10 @@ class MainScreen:
 
     def start_game(self):
         if self.game_is_active:
-            self.root.destroy()
+            self.c.destroy()
             self.game_is_active = False
-            self.settings_screen.settings_screen_is_active = False
-
-        self.root = Tk()
-        self.root.title("Three identical")
-        self.root.resizable(False, False)
-
-        self.mainmenu = Menu(self.root)
-        self.root.config(menu=self.mainmenu)
-        self.mainmenu.add_command(label="New game", command=self.start_game)
-        self.mainmenu.add_command(label="Settings", command=self.show_settings)
+            if self.settings_screen.settings_screen_is_active:
+                self.settings_screen.close()
 
         self.width = self.settings.block_size * self.settings.matrix_size
         self.height = self.settings.block_size * self.settings.matrix_size
