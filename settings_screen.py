@@ -3,15 +3,11 @@ from tkinter import BooleanVar, Toplevel, Checkbutton
 
 
 class SettingsScreen:
-    def __init__(self, settings):
+    def __init__(self, settings, main_screen):
         self.settings = settings
         self.settings_screen = None
         self.settings_screen_is_active = False
-
-        self.remove_all_siblings_var = BooleanVar()
-        self.remove_all_siblings_var.set(1)
-        self.add_multiple_blocks_var = BooleanVar()
-        self.add_multiple_blocks_var.set(1)
+        main_screen.link_to_mainmenu(self)
 
 
     def show(self):
@@ -23,6 +19,11 @@ class SettingsScreen:
         self.settings_screen.resizable(False, False)
         self.settings_screen.protocol("WM_DELETE_WINDOW", self.close)
         self.settings_screen_is_active = True
+
+        self.remove_all_siblings_var = BooleanVar()
+        self.remove_all_siblings_var.set(self.settings.remove_all_siblings)
+        self.add_multiple_blocks_var = BooleanVar()
+        self.add_multiple_blocks_var.set(self.settings.add_multiple_blocks)
 
         Checkbutton(self.settings_screen, 
             text="remove_all_siblings",
@@ -48,7 +49,6 @@ class SettingsScreen:
 
     def close(self):
         self.settings_screen.destroy()
-        print(self.settings_screen)
         self.settings_screen_is_active = False
 
 
