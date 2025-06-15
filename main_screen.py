@@ -13,6 +13,25 @@ class MainScreen:
     def __init__(self, settings):
         self.settings = settings
         self.settings_screen = None
+        self.root = None
+        self.mainmenu = None
+        self.width = None
+        self.height = None
+        self.matrix = None
+        self.c = None
+        self.selected_blocks = None
+        self.game_is_active = False
+
+
+    def link_to_mainmenu(self, settings_screen):
+        self.settings_screen = settings_screen
+
+
+    def start_game(self):
+        if self.game_is_active:
+            self.root.destroy()
+            self.game_is_active = False
+            self.settings_screen.settings_screen_is_active = False
 
         self.root = Tk()
         self.root.title("Three identical")
@@ -60,13 +79,7 @@ class MainScreen:
         self.c.bind("<Button-1>", self.click_block)
         self.c.bind("<Button-3>", self.add_new_blocks)
 
-
-    def link_to_mainmenu(self, settings_screen):
-        self.settings_screen = settings_screen
-
-
-    def start_game(self):
-        # print("new game")
+        self.game_is_active = True
         self.root.mainloop()
 
 
