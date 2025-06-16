@@ -15,7 +15,7 @@ class MainScreen:
         self.settings_screen = None
 
         self.root = Tk()
-        self.root.title("Three identical")
+        self.root.title("Click blocks")
         self.root.resizable(False, False)
 
         self.mainmenu = Menu(self.root)
