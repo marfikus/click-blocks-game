@@ -1,7 +1,7 @@
 
 from settings import Settings
-from settings_screen import SettingsScreen
 from main_screen import MainScreen
+from settings_screen import SettingsScreen
 
 
 def main():

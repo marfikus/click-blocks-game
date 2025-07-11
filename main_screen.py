@@ -31,15 +31,12 @@ class MainScreen:
         self.game_is_active = False
 
 
-    def link_to_mainmenu(self, settings_screen):
-        self.settings_screen = settings_screen
-
-
     def start_game(self):
         if self.game_is_active:
             self.c.destroy()
             self.game_is_active = False
-            if self.settings_screen.settings_screen_is_active:
+
+            if self.settings_screen.screen_is_active:
                 self.settings_screen.close()
 
         self.width = self.settings.block_size * self.settings.matrix_size
